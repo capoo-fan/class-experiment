@@ -1,0 +1,28 @@
+# macOS 系统文件
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+
+# macOS 缩略图
+Icon
+Thumbs.db
+
+# macOS 文件属性
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# 文件系统元数据
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# macOS 文件夹属性
+.DocumentRevisions-V100
