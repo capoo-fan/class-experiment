@@ -1,0 +1,5 @@
+Vivado Simulator 2019.2
+Time resolution is 1 ps
+--- Testbench 开始 ---
+T= 100000 ns: (1) 触发异步复位 (S1=1)
+T= 110000 ns: (2) 启动数码管 (SW0=1), 观察 0.1s 计数器
