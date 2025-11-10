@@ -1,4 +1,4 @@
-// 延时法消抖
+// 计数法消抖
 module debounce #(
     parameter cnt_max=2_000_000
   )(
