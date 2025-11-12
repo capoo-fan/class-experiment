@@ -23,7 +23,7 @@ module top (
   wire string_flag;
   assign string_flag    = (pointer == 14); //整一串字符串发送完成信号
 
-  wire [7:0] string_rom; //存储字符串得到 ascii 码
+  reg [7:0] string_rom; //存储字符串得到 ascii 码
   always @(*)
     begin
       case (pointer)
