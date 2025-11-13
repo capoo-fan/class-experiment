@@ -1,8 +1,8 @@
-module uart_send (
+module uart_send(
     input         clk,
     input         rst,      // 高电平有效, 异步复位
-    input         valid,    // 1个时钟周期的高电平脉冲
     input [7:0]   data,     // 待发送的8位数据
+    input         valid,    // 1个时钟周期的高电平脉冲
     output reg    dout      // 发送信号
   );
   localparam IDLE = 2'b00;  // 空闲态, 发送高电平
@@ -21,7 +21,7 @@ module uart_send (
   wire baud_tick;
   assign baud_tick = (baud_cnt == cnt_max); // 计数到10416 , 脉冲为高
 
-  // 波特率计数器
+  // 状态转换时间计数器
   always @(posedge clk or posedge rst)
     begin
       if (rst)
@@ -55,6 +55,7 @@ module uart_send (
         end
     end
 
+  // 描述下一状态逻辑
   always @(*)
     begin
       case (current_state)
@@ -100,7 +101,7 @@ module uart_send (
       endcase
     end
 
-  // dout输出
+  // dout 输出
   always @(posedge clk or posedge rst)
     begin
       if (rst)
