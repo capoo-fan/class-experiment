@@ -1,9 +1,9 @@
 module uart_send (
     input         clk,
-    input         rst,      // 高电平有效, 异步复位
-    input         valid,    // 1个时钟周期的高电平脉冲
-    input [7:0]   data,     // 待发送的8位数据
-    output reg    dout      // 发送信号
+    input         rst,
+    input         valid,
+    input [7:0]   data,
+    output reg    dout
   );
   localparam IDLE = 2'b00;  // 空闲态, 发送高电平
   localparam START = 2'b01;// 起始态, 发送起始位
@@ -21,28 +21,7 @@ module uart_send (
   wire baud_tick;
   assign baud_tick = (baud_cnt == cnt_max); // 计数到10416 , 脉冲为高
 
-  // 波特率计数器
-  always @(posedge clk or posedge rst)
-    begin
-      if (rst)
-        begin
-          baud_cnt <= 16'd0;
-        end
-      else if (current_state == IDLE)
-        begin
-          baud_cnt <= 16'd0; // 空闲时清零
-        end
-      else if (baud_tick)
-        begin
-          baud_cnt <= 16'd0;
-        end
-      else
-        begin
-          baud_cnt <= baud_cnt + 1'b1;
-        end
-    end
-
-  // 状态转移
+  // 状态转换
   always @(posedge clk or posedge rst)
     begin
       if (rst)
@@ -57,6 +36,7 @@ module uart_send (
 
   always @(*)
     begin
+      next_state = current_state;
       case (current_state)
         IDLE:
           begin
@@ -100,7 +80,28 @@ module uart_send (
       endcase
     end
 
-  // dout输出
+  //波特率计数器
+  always @(posedge clk or posedge rst)
+    begin
+      if (rst)
+        begin
+          baud_cnt <= 16'd0;
+        end
+      else if (current_state == IDLE)
+        begin
+          baud_cnt <= 16'd0; // 空闲时清零
+        end
+      else if (baud_tick)
+        begin
+          baud_cnt <= 16'd0;
+        end
+      else
+        begin
+          baud_cnt <= baud_cnt + 1'b1;
+        end
+    end
+
+  // dout
   always @(posedge clk or posedge rst)
     begin
       if (rst)
@@ -113,50 +114,44 @@ module uart_send (
             IDLE:
               dout <= 1'b1;
             START:
-              dout <= 1'b0;              // 起始位
+              dout <= 1'b0;
             DATA:
-              dout <= data_buf[bit_cnt]; // 数据位
+              dout <= data_buf[bit_cnt];
             STOP:
-              dout <= 1'b1;              // 停止位
+              dout <= 1'b1;
             default:
               dout <= 1'b1;
           endcase
         end
     end
 
-  // data_buf 加载数据
+  // data_buf计数器
   always @(posedge clk or posedge rst)
     begin
       if (rst)
         begin
           data_buf <= 8'd0;
         end
-      else
+      else if (current_state == IDLE && next_state == START)
         begin
-          if (current_state == IDLE && next_state == START)
-            begin
-              data_buf <= data;
-            end
+          data_buf <= data;
         end
     end
-
-  // bit_cnt计数器
+    
+  // bit_cnt 计数器
   always @(posedge clk or posedge rst)
     begin
       if (rst)
         begin
           bit_cnt <= 3'd0;
         end
-      else
+      else if (current_state == START && next_state == DATA)
         begin
-          if (current_state == START && next_state == DATA)
-            begin
-              bit_cnt <= 3'd0;
-            end
-          else if (current_state == DATA && baud_tick)
-            begin
-              bit_cnt <= bit_cnt + 1'b1;
-            end
+          bit_cnt <= 3'd0;
+        end
+      else if (current_state == DATA && baud_tick)
+        begin
+          bit_cnt <= bit_cnt + 1'b1;
         end
     end
 endmodule

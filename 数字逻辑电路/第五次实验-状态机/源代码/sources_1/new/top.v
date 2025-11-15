@@ -1,4 +1,4 @@
-module top (
+module top (                   //最终版
     input wire clk,      // 100MHz 时钟
     input wire rst,    // 异步复位 (S1, 高电平有效)
     output wire uart_tx   // UART 发射引脚
@@ -12,40 +12,52 @@ module top (
   localparam [1:0] s_delay   = 2'b10;
 
   reg [1:0]  current_state, next_state;
-  reg [24:0] delay_cnt_reg; // 延迟计数器
-  reg [18:0] char_wait_cnt; //字符计数器
+  reg [24:0] delay_cnt_reg;
+  reg [18:0] char_wait_cnt;
   reg [3:0]  pointer; // 指向当前发送字符
-  reg        uart_valid; 
+  reg        uart_valid;
 
-  reg [7:0] string_rom [0:14];
+  reg [7:0] string_rom ;
   always @(*)
     begin
-      string_rom[0]  = 8'h68;// 'h'
-      string_rom[1]  = 8'h69;// 'i'
-      string_rom[2]  = 8'h74;// 't'
-      string_rom[3]  = 8'h73;// 's'
-      string_rom[4]  = 8'h7A;// 'z'
-      string_rom[5]  = 8'h32;// '2'
-      string_rom[6]  = 8'h30;// '0'
-      string_rom[7]  = 8'h32;// '2'
-      string_rom[8]  = 8'h34;// '4'
-      string_rom[9]  = 8'h33;// '3'
-      string_rom[10] = 8'h31;// '1'
-      string_rom[11] = 8'h31;// '1'
-      string_rom[12] = 8'h32;// '2'
-      string_rom[13] = 8'h37;// '7'
-      string_rom[14] = 8'h38;// '8'
+      case (pointer)
+        4'd0:
+          string_rom = 8'h68;// 'h'
+        4'd1:
+          string_rom = 8'h69;// 'i'
+        4'd2:
+          string_rom = 8'h74;// 't'
+        4'd3:
+          string_rom = 8'h73;// 's'
+        4'd4:
+          string_rom = 8'h7A;// 'z'
+        4'd5:
+          string_rom = 8'h32;// '2'
+        4'd6:
+          string_rom = 8'h30;// '0'
+        4'd7:
+          string_rom = 8'h32;// '2'
+        4'd8:
+          string_rom = 8'h34;// '4'
+        4'd9:
+          string_rom = 8'h33;// '3'
+        4'd10:
+          string_rom = 8'h31;// '1'
+        4'd11:
+          string_rom = 8'h31;// '1'
+        4'd12:
+          string_rom = 8'h32;// '2'
+        4'd13:
+          string_rom = 8'h37;// '7'
+        4'd14:
+          string_rom = 8'h38;// '8'
+        default:
+          string_rom = 8'h00;
+      endcase
     end
 
-  // 状态转移
-  always @(posedge clk or posedge rst)
-    begin
-      if (rst)
-        current_state <= send_char;
-      else
-        current_state <= next_state;
-    end  
-  always @(*)
+  // 状态组合逻辑
+  always @*
     begin
       next_state = current_state;
       case (current_state)
@@ -54,12 +66,7 @@ module top (
         wait_char:
           begin
             if (char_wait_cnt == char_wait_max - 1)
-              begin
-                if (pointer == 14)
-                  next_state = s_delay;
-                else
-                  next_state = send_char;
-              end
+              next_state = (pointer == 14) ? s_delay : send_char;
           end
         s_delay:
           begin
@@ -71,18 +78,25 @@ module top (
       endcase
     end
 
-  
+  // 状态寄存器
+  always @(posedge clk or posedge rst)
+    begin
+      if (rst)
+        current_state <= send_char;
+      else
+        current_state <= next_state;
+    end
 
-  // uart_valid 
+  // uart_valid
   always @(posedge clk or posedge rst)
     begin
       if (rst)
         uart_valid <= 1'b0;
       else
-        uart_valid <= (next_state == send_char); 
+        uart_valid <= (current_state == send_char);
     end
 
-  // 字符发送等待计数
+  // 字符等待计数
   always @(posedge clk or posedge rst)
     begin
       if (rst)
@@ -91,14 +105,14 @@ module top (
         char_wait_cnt <= 19'd0;
       else if (current_state == wait_char)
         begin
-          if (char_wait_cnt == char_wait_max - 1)
-            char_wait_cnt <= char_wait_cnt; // 保持
-          else
+          if (char_wait_cnt != char_wait_max - 1)
             char_wait_cnt <= char_wait_cnt + 1'b1;
         end
+      else
+        char_wait_cnt <= 19'd0;
     end
 
-  // 发送字符计数
+  // 字符指针
   always @(posedge clk or posedge rst)
     begin
       if (rst)
@@ -119,20 +133,17 @@ module top (
         delay_cnt_reg <= 25'd0;
       else if (current_state == s_delay)
         begin
-          if (delay_cnt_reg == string_delay)
-            delay_cnt_reg <= delay_cnt_reg; // 保持
-          else
+          if (delay_cnt_reg != string_delay)
             delay_cnt_reg <= delay_cnt_reg + 1'b1;
         end
       else
         delay_cnt_reg <= 25'd0;
     end
-
   // 实例uart_send 模块
   uart_send u_uart_send (
               .clk    (clk),
               .rst    (rst),
-              .data   (string_rom[pointer]),
+              .data   (string_rom),
               .valid  (uart_valid),
               .dout   (uart_tx)
             );
