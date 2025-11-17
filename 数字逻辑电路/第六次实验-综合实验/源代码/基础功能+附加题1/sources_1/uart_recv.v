@@ -152,7 +152,7 @@ module uart_recv (
         begin
           valid <= 1'b0;
         end
-      else if (current_state == STOP && cyc_flag) // 接受完毕，valid 升高，作为处理数据信号传送给 display_logic
+      else if (current_state == STOP && cyc_flag) // valid 升高，作为处理数据信号传送给 display_logic
         begin
           valid <= 1'b1;
         end
