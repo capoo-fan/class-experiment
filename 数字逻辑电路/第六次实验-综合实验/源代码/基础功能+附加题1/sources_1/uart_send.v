@@ -36,6 +36,7 @@ module uart_send (
 
   always @(*)
     begin
+      next_state = current_state;
       case (current_state)
         IDLE:
           begin

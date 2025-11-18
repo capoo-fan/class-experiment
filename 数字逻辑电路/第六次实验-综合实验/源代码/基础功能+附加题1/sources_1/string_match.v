@@ -45,7 +45,7 @@ module string_match(
 
   reg       flag;
 
-  // ????
+  // 状态转移
   always @(posedge clk or posedge rst)
     begin
       if (rst)
@@ -210,7 +210,7 @@ module string_match(
   reg       uart_valid;
   reg [7:0] string_rom;
 
-  // mealy
+  // mealy 状态机
   always @(*)
     begin
       uart_valid = 1'b0;
