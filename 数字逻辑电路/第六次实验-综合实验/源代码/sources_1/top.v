@@ -26,8 +26,14 @@ module top (
   wire s3_mode_tx;      //send mode
   wire match_mode_tx; //string match mode
 
-  assign uart_tx = (SW0 == 1'b0) ? s3_mode_tx : match_mode_tx;
-
+  //assign uart_tx = (SW0 == 1'b0) ? s3_mode_tx : match_mode_tx;
+  // Ñ¡ÔñÆ÷
+  mux u_mux (
+        .SW0(SW0),
+        .in0(s3_mode_tx),
+        .in1(match_mode_tx),
+        .uart_tx(uart_tx)
+      );
   // °´¼ü S3 Ïû¶¶
   debounce #(
              .cnt_max(2_000_000)
@@ -86,7 +92,7 @@ module top (
   string_match u_string_match (
                  .clk(clk),
                  .rst(rst),
-                  .valid(recv_valid),
+                 .valid(recv_valid),
                  .recv_data(recv_data),
                  .uart_tx(match_mode_tx)
                );

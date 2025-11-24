@@ -5,14 +5,14 @@ module uart_send (
     input [7:0]   data,
     output reg    dout
   );
-  localparam IDLE = 2'b00;  // 空闲态, 发送高电平
-  localparam START = 2'b01;// 起始态, 发送起始位
-  localparam DATA = 2'b10;  // 数据态, 将8位数据发送出去
-  localparam STOP = 2'b11;// 停止态, 发送停止位
+  localparam IDLE = 2'b00;
+  localparam START = 2'b01;
+  localparam DATA = 2'b10;
+  localparam STOP = 2'b11;
 
   localparam cnt_max = 10415; // 0-10415 共 10416 个周期
 
-  reg [1:0] current_state; //存储状态极的四种状态
+  reg [1:0] current_state; //存储四种状态
   reg [1:0] next_state;
   reg [7:0] data_buf;  // 存储待发送的数据
   reg [15:0] baud_cnt; // 波特率计数器
@@ -33,37 +33,47 @@ module uart_send (
           current_state <= next_state;
         end
     end
-
   always @(*)
     begin
-      next_state = current_state;
       case (current_state)
         IDLE:
           begin
-            if (valid)  //准备发送数据
+            if (valid)
               begin
                 next_state = START;
+              end
+            else
+              begin
+                next_state = IDLE;
               end
           end
         START:
           begin
-            if (baud_tick) // 开始发送
+            if (baud_tick)
               begin
                 next_state = DATA;
+              end
+            else
+              begin
+                next_state = START;
               end
           end
         DATA:
           begin
             if (baud_tick)
               begin
-                if (bit_cnt == 3'd7) //发送完成，停止
+                if (bit_cnt == 3'd7)
                   begin
                     next_state = STOP;
                   end
                 else
                   begin
-                    next_state = DATA; //继续发送数据
+                    next_state = DATA;
                   end
+              end
+            else
+              begin
+                next_state = DATA;
               end
           end
         STOP:
@@ -71,6 +81,10 @@ module uart_send (
             if (baud_tick)
               begin
                 next_state = IDLE;
+              end
+            else
+              begin
+                next_state = STOP;
               end
           end
         default:

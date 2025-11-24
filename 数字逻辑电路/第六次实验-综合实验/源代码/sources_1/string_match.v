@@ -45,7 +45,7 @@ module string_match(
 
   reg       flag;
 
-  // 状态转移
+  // mealy 状态机
   always @(posedge clk or posedge rst)
     begin
       if (rst)
@@ -56,10 +56,8 @@ module string_match(
 
   always @(*)
     begin
-      next_state = current_state;
       if (valid)
         begin
-          next_state = IDLE;
           case (current_state)
             IDLE:
               case (recv_data)
@@ -184,6 +182,8 @@ module string_match(
                   next_state = s_state;
                 h,H:
                   next_state = h_state;
+                t,T:
+                  next_state = st_state;
                 CR,LF:
                   next_state = IDLE;
                 default:
@@ -205,12 +205,16 @@ module string_match(
               next_state = IDLE;
           endcase
         end
+      else
+        begin
+          next_state = current_state;
+        end
     end
 
   reg       uart_valid;
   reg [7:0] string_rom;
 
-  // mealy 状态机
+  // mealy
   always @(*)
     begin
       uart_valid = 1'b0;
@@ -236,8 +240,7 @@ module string_match(
                   uart_valid = 1'b1;
                   string_rom = 8'h33;
                 end
-            default:
-              ;
+            default:;
           endcase
           if (uart_valid == 1'b0 && (recv_data == CR || recv_data == LF))
             begin

@@ -1,8 +1,8 @@
 module send_ctrl (
-    input wire clk,      
-    input wire rst,  
+    input wire clk,
+    input wire rst,
     input wire s3,
-    output wire uart_tx  
+    output wire uart_tx
   );
 
   localparam cycles_per_bit = 10416; // 10417 一个比特的时间
@@ -16,7 +16,7 @@ module send_ctrl (
   reg [18:0] char_wait_cnt; //字符计数器
   reg [3:0]  pointer; // 指向当前发送字符
   reg        uart_valid;
-
+  
   reg [7:0] string_rom ;
   always @(*)
     begin
@@ -80,7 +80,7 @@ module send_ctrl (
           begin
             if (char_wait_cnt == char_wait_max - 1)
               begin
-                if (pointer == 4'd14)
+                if (pointer == 14)
                   next_state = idle;
                 else
                   next_state = send_char;
@@ -111,11 +111,11 @@ module send_ctrl (
         char_wait_cnt <= 19'd0;
       else if (current_state == wait_char)
         begin
-          if (char_wait_cnt != char_wait_max - 1)
+          if (char_wait_cnt == char_wait_max - 1)
+            char_wait_cnt <= 19'd0;
+          else
             char_wait_cnt <= char_wait_cnt + 1'b1;
         end
-      else
-        char_wait_cnt <= 19'd0;
     end
 
   // 发送字符计数
@@ -125,13 +125,12 @@ module send_ctrl (
         pointer <= 4'd0;
       else if (current_state == wait_char && char_wait_cnt == char_wait_max - 1)
         begin
-          if (pointer == 4'd14)
+          if (pointer == 14)
             pointer <= 4'd0;
           else
             pointer <= pointer + 1'b1;
         end
     end
-
 
   // 实例uart_send 模块
   uart_send u_uart_send (
