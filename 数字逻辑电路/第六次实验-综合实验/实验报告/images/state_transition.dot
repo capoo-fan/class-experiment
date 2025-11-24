@@ -1,0 +1,109 @@
+digraph Mealy_String_Match {
+    rankdir=LR;
+    node [shape=circle];
+    
+    // --- 图例 (Legend) ---
+    label = "Mealy 状态机 \n";
+    
+    // --- 13 个状态定义 ---
+    IDLE [shape=doublecircle]; // 起始状态 [cite: 276]
+    s_state;
+    st_state;
+    sta_state;
+    star_state;
+    start_state [shape=box, label="start_state\n(匹配 'start')"]; // 匹配 "start" 的状态 [cite: 278]
+    sto_state;
+    stop_state [shape=box, label="stop_state\n(匹配 'stop')"]; // 匹配 "stop" 的状态 [cite: 279]
+    h_state;
+    hi_state;
+    hit_state;
+    hits_state;
+    hitsz_state [shape=box, label="hitsz_state\n(匹配 'hitsz')"]; // 匹配 "hitsz" 的状态 [cite: 281]
+
+    // ===================================
+    // --- 1. 产生输出的转换 (Mealy Edges) ---
+    // ===================================
+    
+    // 蓝色: 即时匹配 [cite: 348-351]
+    star_state -> start_state [label="t, T / 1", color="blue", fontcolor="blue", penwidth=2.0]; // 输出 '1' [cite: 349]
+    sto_state -> stop_state [label="p, P / 2", color="blue", fontcolor="blue", penwidth=2.0]; // 输出 '2' [cite: 350]
+    hits_state -> hitsz_state [label="z, Z / 3", color="blue", fontcolor="blue", penwidth=2.0]; // 输出 '3' [cite: 351]
+
+    // 红色: 条件 '0' 输出 [cite: 352-353]
+    // (FSM 逻辑 + 输出逻辑 [cite: 352-353])
+    IDLE -> IDLE [label="CR, LF / 0*", color="red", fontcolor="red", penwidth=2.0, style="dashed"];
+    s_state -> IDLE [label="CR, LF / 0*", color="red", fontcolor="red", penwidth=2.0, style="dashed"];
+    st_state -> IDLE [label="CR, LF / 0*", color="red", fontcolor="red", penwidth=2.0, style="dashed"];
+    sta_state -> IDLE [label="CR, LF / 0*", color="red", fontcolor="red", penwidth=2.0, style="dashed"];
+    star_state -> IDLE [label="CR, LF / 0*", color="red", fontcolor="red", penwidth=2.0, style="dashed"];
+    sto_state -> IDLE [label="CR, LF / 0*", color="red", fontcolor="red", penwidth=2.0, style="dashed"];
+    h_state -> IDLE [label="CR, LF / 0*", color="red", fontcolor="red", penwidth=2.0, style="dashed"];
+    hi_state -> IDLE [label="CR, LF / 0*", color="red", fontcolor="red", penwidth=2.0, style="dashed"];
+    hit_state -> IDLE [label="CR, LF / 0*", color="red", fontcolor="red", penwidth=2.0, style="dashed"];
+    hits_state -> IDLE [label="CR, LF / 0*", color="red", fontcolor="red", penwidth=2.0, style="dashed"];
+    start_state -> IDLE [label="CR, LF / 0*", color="red", fontcolor="red", penwidth=2.0, style="dashed"]; // [cite: 343]
+    stop_state -> IDLE [label="CR, LF / 0*", color="red", fontcolor="red", penwidth=2.0, style="dashed"]; // [cite: 343]
+    hitsz_state -> IDLE [label="CR, LF / 0*", color="red", fontcolor="red", penwidth=2.0, style="dashed"]; // [cite: 343]
+
+
+    // ===================================
+    // --- 2. 无输出的转换 (FSM Edges) ---
+    // ===================================
+
+    // "start" 路径
+    IDLE -> s_state [label="s, S / -"]; // [cite: 292]
+    s_state -> st_state [label="t, T / -"]; // [cite: 296]
+    st_state -> sta_state [label="a, A / -"]; // [cite: 301]
+    sta_state -> star_state [label="r, R / -"]; // [cite: 307]
+
+    // "stop" 路径
+    st_state -> sto_state [label="o, O / -"]; // [cite: 302]
+
+    // "hitsz" 路径
+    IDLE -> h_state [label="h, H / -"]; // [cite: 293]
+    h_state -> hi_state [label="i, I / -"]; // [cite: 322]
+    hi_state -> hit_state [label="t, T / -"]; // [cite: 327]
+    hit_state -> hits_state [label="s, S / -"]; // [cite: 332]
+    
+    // "other" 转换 (去 IDLE)
+    IDLE -> IDLE [label="other / -"];
+    s_state -> IDLE [label="other / -"];
+    st_state -> IDLE [label="other / -"];
+    sta_state -> IDLE [label="other / -"];
+    star_state -> IDLE [label="other / -"];
+    sto_state -> IDLE [label="other / -"];
+    h_state -> IDLE [label="other / -"];
+    hi_state -> IDLE [label="other / -"];
+    hit_state -> IDLE [label="other / -"];
+    hits_state -> IDLE [label="other / -"];
+    start_state -> IDLE [label="other / -"]; // [cite: 344]
+    stop_state -> IDLE [label="other / -"]; // [cite: 344]
+    hitsz_state -> IDLE [label="other / -"]; // [cite: 344]
+
+    // 交叉跳转到 's_state'
+    s_state -> s_state [label="s, S / -"];
+    st_state -> s_state [label="s, S / -"];
+    sta_state -> s_state [label="s, S / -"];
+    star_state -> s_state [label="s, S / -"];
+    sto_state -> s_state [label="s, S / -"];
+    h_state -> s_state [label="s, S / -"];
+    hi_state -> s_state [label="s, S / -"];
+    hits_state -> s_state [label="s, S / -"];
+    start_state -> s_state [label="s, S / -"]; // [cite: 341]
+    stop_state -> s_state [label="s, S / -"]; // [cite: 341]
+    hitsz_state -> s_state [label="s, S / -"]; // [cite: 341]
+
+    // 交叉跳转到 'h_state'
+    s_state -> h_state [label="h, H / -"];
+    st_state -> h_state [label="h, H / -"];
+    sta_state -> h_state [label="h, H / -"];
+    star_state -> h_state [label="h, H / -"];
+    sto_state -> h_state [label="h, H / -"];
+    h_state -> h_state [label="h, H / -"];
+    hi_state -> h_state [label="h, H / -"];
+    hit_state -> h_state [label="h, H / -"];
+    hits_state -> h_state [label="h, H / -"];
+    start_state -> h_state [label="h, H / -"]; // [cite: 342]
+    stop_state -> h_state [label="h, H / -"]; // [cite: 342]
+    hitsz_state -> h_state [label="h, H / -"]; // [cite: 342]
+}
