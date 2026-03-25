@@ -1,5 +1,5 @@
 @startuml
-title AircraftWar 继承关系类图（迭代1 CheckList）
+title AircraftWar 系统继承关系类图（任务4.3）
 
 skinparam classAttributeIconSize 0
 skinparam packageStyle rectangle
@@ -47,11 +47,13 @@ abstract class AbstractEnemy {
 }
 
 class HeroAircraft {
+    - {static} instance : HeroAircraft
     - shootNum : int
     - power : int
     - direction : int
 
-    + HeroAircraft(int locationX, int locationY, int speedX, int speedY, int hp)
+    - HeroAircraft(int locationX, int locationY, int speedX, int speedY, int hp)
+    + {static} getInstance(int locationX, int locationY, int speedX, int speedY, int hp) : HeroAircraft
     + forward() : void
     + shoot() : List<BaseBullet>
 }
@@ -163,15 +165,18 @@ AbstractProp <|-- FireSupply
 AbstractProp <|-- FirePlusSupply
 AbstractProp <|-- FreezeSupply
 
-Game --> HeroAircraft : 持有
+Game --> HeroAircraft : 持有 heroAircraft
+Game ..> HeroAircraft : getInstance(...)
 Game --> "0..*" AbstractAircraft : 持有 enemyAircrafts
 Game --> "0..*" BaseBullet : 持有 bullets
 HeroController --> HeroAircraft : 控制移动
 HeroController --> Game : 注册监听
 
 note right of HeroAircraft
-    当前模板版中 HeroAircraft 仍可直接 new。
-    任务2将改造为单例模式创建。
+    单例关键点：
+    1) 私有静态实例 instance
+    2) 私有构造方法
+    3) 静态方法 getInstance() 统一创建
 end note
 
 note right of Game

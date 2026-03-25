@@ -6,14 +6,19 @@ skinparam classAttributeIconSize 0
 class HeroAircraft {
   - {static} instance : HeroAircraft
   - HeroAircraft(int locationX, int locationY, int speedX, int speedY, int hp)
-  + {static} getInstance(int locationX, int locationY, int speedX, int speedY, int hp) : HeroAircraft
+  + {static} {synchronized} getInstance(int locationX, int locationY, int speedX, int speedY, int hp) : HeroAircraft
   + shoot() : List<BaseBullet>
   + forward() : void
 }
 
+abstract class AbstractAircraft
+
 class Game {
+  - heroAircraft : HeroAircraft
   + Game()
 }
+
+AbstractAircraft <|-- HeroAircraft
 
 Game ..> HeroAircraft : getInstance(...)
 
