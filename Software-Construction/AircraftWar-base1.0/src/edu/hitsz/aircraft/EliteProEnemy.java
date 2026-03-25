@@ -6,14 +6,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * 普通敌机
- * 不可射击、不掉落道具
- * 
- * @author hitsz
+ * 进阶精英敌机
  */
-public class MobEnemy extends AbstractEnemy {
+public class EliteProEnemy extends AbstractEnemy {
 
-    public MobEnemy(int locationX, int locationY, int speedX, int speedY, int hp) {
+    public EliteProEnemy(int locationX, int locationY, int speedX, int speedY, int hp) {
         super(locationX, locationY, speedX, speedY, hp);
     }
 
@@ -21,5 +18,4 @@ public class MobEnemy extends AbstractEnemy {
     public List<BaseBullet> shoot() {
         return new LinkedList<>();
     }
-
 }

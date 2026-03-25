@@ -1,0 +1,27 @@
+@startuml
+title 英雄机单例模式结构图（任务1）
+
+skinparam classAttributeIconSize 0
+
+class HeroAircraft {
+  - {static} instance : HeroAircraft
+  - HeroAircraft(int locationX, int locationY, int speedX, int speedY, int hp)
+  + {static} getInstance(int locationX, int locationY, int speedX, int speedY, int hp) : HeroAircraft
+  + shoot() : List<BaseBullet>
+  + forward() : void
+}
+
+class Game {
+  + Game()
+}
+
+Game ..> HeroAircraft : getInstance(...)
+
+note right of HeroAircraft
+  关键点：
+  1) 私有静态实例
+  2) 私有构造方法
+  3) 静态访问方法 getInstance()
+end note
+
+@enduml
