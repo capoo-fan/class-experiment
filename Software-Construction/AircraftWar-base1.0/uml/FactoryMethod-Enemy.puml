@@ -1,0 +1,55 @@
+@startuml
+
+title AircraftWar 工厂方法模式（敌机创建）
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+class Game {
+  - createRandomEnemy() : AbstractAircraft
+}
+
+interface EnemyFactory {
+  + createEnemy() : AbstractEnemy
+}
+
+abstract class AbstractEnemyFactory {
+  # randomSpawnX(imageWidth : int) : int
+  # randomSpawnY() : int
+  # randomSideSpeed(minAbsSpeed : int, maxAbsSpeed : int) : int
+}
+
+class MobEnemyFactory
+class EliteEnemyFactory
+class ElitePlusEnemyFactory
+class EliteProEnemyFactory
+
+abstract class AbstractEnemy
+class MobEnemy
+class EliteEnemy
+class ElitePlusEnemy
+class EliteProEnemy
+
+EnemyFactory <|.. AbstractEnemyFactory
+AbstractEnemyFactory <|-- MobEnemyFactory
+AbstractEnemyFactory <|-- EliteEnemyFactory
+AbstractEnemyFactory <|-- ElitePlusEnemyFactory
+AbstractEnemyFactory <|-- EliteProEnemyFactory
+
+AbstractEnemy <|-- MobEnemy
+AbstractEnemy <|-- EliteEnemy
+AbstractEnemy <|-- ElitePlusEnemy
+AbstractEnemy <|-- EliteProEnemy
+
+Game ..> EnemyFactory : 依赖
+MobEnemyFactory ..> MobEnemy : 创建
+EliteEnemyFactory ..> EliteEnemy : 创建
+ElitePlusEnemyFactory ..> ElitePlusEnemy : 创建
+EliteProEnemyFactory ..> EliteProEnemy : 创建
+
+note right of Game
+  按权重随机选择工厂，
+  按周期创建 4 类非 Boss 敌机
+end note
+
+@enduml

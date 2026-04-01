@@ -7,8 +7,11 @@ import edu.hitsz.prop.*;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,26 +45,116 @@ public class ImageManager {
     public static BufferedImage FIRE_PLUS_SUPPLY_IMAGE;
     public static BufferedImage FREEZE_SUPPLY_IMAGE;
 
+    private static final String[] IMAGE_NAMES = {
+            "bg.jpg",
+            "hero.png",
+            "mob.png",
+            "elite.png",
+            "elitePlus.png",
+            "elitePro.png",
+            "boss.png",
+            "prop_blood.png",
+            "prop_bomb.png",
+            "prop_bullet.png",
+            "prop_bulletPlus.png",
+            "prop_freeze.png",
+            "bullet_hero.png",
+            "bullet_enemy.png"
+    };
+
+    private static Path imageBaseDir;
+
+    private static BufferedImage loadImage(String fileName) throws IOException {
+        // 优先使用 classpath 资源，适配打包后运行
+        try (InputStream inputStream = ImageManager.class.getResourceAsStream("/images/" + fileName)) {
+            if (inputStream != null) {
+                return ImageIO.read(inputStream);
+            }
+        }
+
+        Path baseDir = resolveImageBaseDir();
+        Path imagePath = baseDir.resolve(fileName);
+        return ImageIO.read(imagePath.toFile());
+    }
+
+    private static Path resolveImageBaseDir() throws IOException {
+        if (imageBaseDir != null) {
+            return imageBaseDir;
+        }
+
+        String customAssetsDir = System.getProperty("aircraftwar.assetsDir");
+        if (customAssetsDir != null) {
+            Path customDir = Paths.get(customAssetsDir).toAbsolutePath().normalize();
+            if (Files.isDirectory(customDir) && hasAllRequiredImages(customDir)) {
+                imageBaseDir = customDir;
+                return imageBaseDir;
+            }
+        }
+
+        Path[] quickCandidates = {
+                Paths.get("src", "images"),
+                Paths.get("Software-Construction", "AircraftWar-base1.0", "src", "images")
+        };
+        for (Path candidate : quickCandidates) {
+            Path absoluteCandidate = candidate.toAbsolutePath().normalize();
+            if (Files.isDirectory(absoluteCandidate) && hasAllRequiredImages(absoluteCandidate)) {
+                imageBaseDir = absoluteCandidate;
+                return imageBaseDir;
+            }
+        }
+
+        Path cwd = Paths.get("").toAbsolutePath().normalize();
+        try (java.util.stream.Stream<Path> pathStream = Files.walk(cwd, 6)) {
+            Path matched = pathStream
+                    .filter(Files::isDirectory)
+                    .filter(path -> path.getFileName() != null && "images".equals(path.getFileName().toString()))
+                    .filter(path -> {
+                        Path parent = path.getParent();
+                        return parent != null
+                                && parent.getFileName() != null
+                                && "src".equals(parent.getFileName().toString());
+                    })
+                    .filter(ImageManager::hasAllRequiredImages)
+                    .findFirst()
+                    .orElse(null);
+            if (matched != null) {
+                imageBaseDir = matched;
+                return imageBaseDir;
+            }
+        }
+
+        throw new IOException("Cannot locate image assets directory. Expected folder: src/images");
+    }
+
+    private static boolean hasAllRequiredImages(Path dir) {
+        for (String imageName : IMAGE_NAMES) {
+            if (!Files.isRegularFile(dir.resolve(imageName))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     static {
         try {
 
-            BACKGROUND_IMAGE = ImageIO.read(new FileInputStream("src/images/bg.jpg"));
+            BACKGROUND_IMAGE = loadImage("bg.jpg");
 
-            HERO_IMAGE = ImageIO.read(new FileInputStream("src/images/hero.png"));
-            MOB_ENEMY_IMAGE = ImageIO.read(new FileInputStream("src/images/mob.png"));
-            ELITE_ENEMY_IMAGE = ImageIO.read(new FileInputStream("src/images/elite.png"));
-            ELITE_PLUS_ENEMY_IMAGE = ImageIO.read(new FileInputStream("src/images/elitePlus.png"));
-            ELITE_PRO_ENEMY_IMAGE = ImageIO.read(new FileInputStream("src/images/elitePro.png"));
-            BOSS_ENEMY_IMAGE = ImageIO.read(new FileInputStream("src/images/boss.png"));
+            HERO_IMAGE = loadImage("hero.png");
+            MOB_ENEMY_IMAGE = loadImage("mob.png");
+            ELITE_ENEMY_IMAGE = loadImage("elite.png");
+            ELITE_PLUS_ENEMY_IMAGE = loadImage("elitePlus.png");
+            ELITE_PRO_ENEMY_IMAGE = loadImage("elitePro.png");
+            BOSS_ENEMY_IMAGE = loadImage("boss.png");
 
-            BLOOD_SUPPLY_IMAGE = ImageIO.read(new FileInputStream("src/images/prop_blood.png"));
-            BOMB_SUPPLY_IMAGE = ImageIO.read(new FileInputStream("src/images/prop_bomb.png"));
-            FIRE_SUPPLY_IMAGE = ImageIO.read(new FileInputStream("src/images/prop_bullet.png"));
-            FIRE_PLUS_SUPPLY_IMAGE = ImageIO.read(new FileInputStream("src/images/prop_bulletPlus.png"));
-            FREEZE_SUPPLY_IMAGE = ImageIO.read(new FileInputStream("src/images/prop_freeze.png"));
+            BLOOD_SUPPLY_IMAGE = loadImage("prop_blood.png");
+            BOMB_SUPPLY_IMAGE = loadImage("prop_bomb.png");
+            FIRE_SUPPLY_IMAGE = loadImage("prop_bullet.png");
+            FIRE_PLUS_SUPPLY_IMAGE = loadImage("prop_bulletPlus.png");
+            FREEZE_SUPPLY_IMAGE = loadImage("prop_freeze.png");
 
-            HERO_BULLET_IMAGE = ImageIO.read(new FileInputStream("src/images/bullet_hero.png"));
-            ENEMY_BULLET_IMAGE = ImageIO.read(new FileInputStream("src/images/bullet_enemy.png"));
+            HERO_BULLET_IMAGE = loadImage("bullet_hero.png");
+            ENEMY_BULLET_IMAGE = loadImage("bullet_enemy.png");
 
             CLASSNAME_IMAGE_MAP.put(HeroAircraft.class.getName(), HERO_IMAGE);
             CLASSNAME_IMAGE_MAP.put(MobEnemy.class.getName(), MOB_ENEMY_IMAGE);

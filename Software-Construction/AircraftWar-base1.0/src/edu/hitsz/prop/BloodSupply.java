@@ -11,6 +11,6 @@ public class BloodSupply extends AbstractProp {
 
     @Override
     public void effect() {
-        System.out.println("BloodSupply active!");
+        // 加血在 Game 中直接处理，不需要额外提示
     }
 }

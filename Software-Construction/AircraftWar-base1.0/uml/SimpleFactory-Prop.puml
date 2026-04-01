@@ -1,0 +1,33 @@
+@startuml
+
+title AircraftWar 简单工厂模式（道具创建）
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+class Game {
+  - tryGenerateProp(enemyAircraft) : void
+}
+
+class PropSimpleFactory {
+  + {static} createRandomProp(locationX : int, locationY : int, speedX : int, speedY : int) : AbstractProp
+}
+
+abstract class AbstractProp
+class BloodSupply
+class FireSupply
+class FirePlusSupply
+
+AbstractProp <|-- BloodSupply
+AbstractProp <|-- FireSupply
+AbstractProp <|-- FirePlusSupply
+
+Game ..> PropSimpleFactory : 使用
+PropSimpleFactory ..> AbstractProp : 创建
+
+note right of PropSimpleFactory
+  根据随机数创建具体道具实例：
+  BloodSupply / FireSupply / FirePlusSupply
+end note
+
+@enduml
