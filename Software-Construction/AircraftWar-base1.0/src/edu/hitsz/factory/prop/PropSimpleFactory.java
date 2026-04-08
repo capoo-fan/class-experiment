@@ -58,4 +58,20 @@ public class PropSimpleFactory {
                 return new FreezeSupply(locationX, locationY, speedX, speedY);
         }
     }
+
+    public static AbstractProp createForBoss(int locationX, int locationY, int speedX, int speedY) {
+        int choice = ThreadLocalRandom.current().nextInt(5);
+        switch (choice) {
+            case 0:
+                return new BloodSupply(locationX, locationY, speedX, speedY);
+            case 1:
+                return new BombSupply(locationX, locationY, speedX, speedY);
+            case 2:
+                return new FireSupply(locationX, locationY, speedX, speedY);
+            case 3:
+                return new FirePlusSupply(locationX, locationY, speedX, speedY);
+            default:
+                return new FreezeSupply(locationX, locationY, speedX, speedY);
+        }
+    }
 }

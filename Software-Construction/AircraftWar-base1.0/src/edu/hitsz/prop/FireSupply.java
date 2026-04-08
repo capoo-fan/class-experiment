@@ -1,5 +1,8 @@
 package edu.hitsz.prop;
 
+import edu.hitsz.aircraft.HeroAircraft;
+import edu.hitsz.aircraft.strategy.ScatterShootStrategy;
+
 /**
  * 火力道具
  */
@@ -11,6 +14,10 @@ public class FireSupply extends AbstractProp {
 
     @Override
     public void effect() {
-        System.out.println("FireSupply active!");
+        HeroAircraft heroAircraft = HeroAircraft.getInstance();
+        if (heroAircraft != null) {
+            heroAircraft.setShootStrategy(new ScatterShootStrategy());
+        }
+        System.out.println("FireSupply active! Hero strategy -> ScatterShootStrategy");
     }
 }

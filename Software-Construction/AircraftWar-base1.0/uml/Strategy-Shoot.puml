@@ -1,0 +1,56 @@
+@startuml
+
+title AircraftWar 策略模式（弹道与火力道具）
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+interface ShootStrategy {
+  + shoot(locationX : int, locationY : int, speedY : int, power : int, direction : int, heroBullet : boolean) : List<BaseBullet>
+}
+
+abstract class AbstractShootStrategy
+class StraightShootStrategy
+class ScatterShootStrategy
+class CircleShootStrategy
+
+class HeroAircraft {
+  - shootStrategy : ShootStrategy
+  + setShootStrategy(strategy : ShootStrategy) : void
+  + shoot() : List<BaseBullet>
+}
+
+class EliteEnemy
+class ElitePlusEnemy
+class EliteProEnemy
+class BossEnemy
+
+class FireSupply {
+  + effect() : void
+}
+
+class FirePlusSupply {
+  + effect() : void
+}
+
+ShootStrategy <|.. AbstractShootStrategy
+AbstractShootStrategy <|-- StraightShootStrategy
+AbstractShootStrategy <|-- ScatterShootStrategy
+AbstractShootStrategy <|-- CircleShootStrategy
+
+HeroAircraft --> ShootStrategy : 持有并委托
+EliteEnemy --> ShootStrategy : 委托
+ElitePlusEnemy --> ShootStrategy : 委托
+EliteProEnemy --> ShootStrategy : 委托
+BossEnemy --> ShootStrategy : 委托
+
+FireSupply ..> HeroAircraft : 切换为 ScatterShootStrategy
+FirePlusSupply ..> HeroAircraft : 切换为 CircleShootStrategy
+
+note right of HeroAircraft
+  默认策略: StraightShootStrategy(1)
+  FireSupply: 切换散射
+  FirePlusSupply: 切换环射
+end note
+
+@enduml

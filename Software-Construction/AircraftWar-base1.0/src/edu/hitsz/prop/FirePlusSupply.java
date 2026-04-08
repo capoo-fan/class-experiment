@@ -1,5 +1,8 @@
 package edu.hitsz.prop;
 
+import edu.hitsz.aircraft.HeroAircraft;
+import edu.hitsz.aircraft.strategy.CircleShootStrategy;
+
 /**
  * 超级火力道具
  */
@@ -11,6 +14,10 @@ public class FirePlusSupply extends AbstractProp {
 
     @Override
     public void effect() {
-        System.out.println("FirePlusSupply active!");
+        HeroAircraft heroAircraft = HeroAircraft.getInstance();
+        if (heroAircraft != null) {
+            heroAircraft.setShootStrategy(new CircleShootStrategy(20, 7));
+        }
+        System.out.println("FirePlusSupply active! Hero strategy -> CircleShootStrategy");
     }
 }
