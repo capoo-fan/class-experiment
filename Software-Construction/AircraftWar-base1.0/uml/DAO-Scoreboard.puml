@@ -1,0 +1,49 @@
+@startuml
+
+title AircraftWar DAO Pattern (Leaderboard)
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "application" {
+  class Game {
+    - score : int
+    - scoreRecordDao : ScoreRecordDao
+    + checkResultAction() : void
+    + saveAndPrintLeaderboard() : void
+  }
+}
+
+package "dao" {
+  class ScoreRecord {
+    - playerName : String
+    - score : int
+    - recordTime : LocalDateTime
+    + toStorageLine() : String
+    + fromStorageLine(line : String) : ScoreRecord
+  }
+
+  interface ScoreRecordDao {
+    + getAllRecords() : List<ScoreRecord>
+    + addRecord(record : ScoreRecord) : void
+  }
+
+  class FileScoreRecordDao {
+    - storageFile : Path
+    + getAllRecords() : List<ScoreRecord>
+    + addRecord(record : ScoreRecord) : void
+    - resolveStorageFile() : Path
+  }
+}
+
+ScoreRecordDao <|.. FileScoreRecordDao
+Game ..> ScoreRecordDao : use
+FileScoreRecordDao ..> ScoreRecord : read/write
+
+note right of ScoreRecordDao
+  DAO Pattern
+  - separate business logic from data access
+  - allow swapping data source implementation
+end note
+
+@enduml

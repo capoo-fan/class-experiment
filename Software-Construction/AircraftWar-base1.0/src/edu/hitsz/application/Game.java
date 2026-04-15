@@ -12,10 +12,14 @@ import edu.hitsz.factory.enemy.MobEnemyFactory;
 import edu.hitsz.factory.prop.PropSimpleFactory;
 import edu.hitsz.prop.AbstractProp;
 import edu.hitsz.prop.BloodSupply;
+import edu.hitsz.dao.FileScoreRecordDao;
+import edu.hitsz.dao.ScoreRecord;
+import edu.hitsz.dao.ScoreRecordDao;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.List;
 import java.util.Timer;
@@ -72,6 +76,10 @@ public class Game extends JPanel {
     // 游戏结束标志
     private boolean gameOverFlag = false;
 
+    private static final String DEFAULT_PLAYER_NAME = "Player";
+
+    private final ScoreRecordDao scoreRecordDao;
+
     public Game() {
         heroAircraft = HeroAircraft.getInstance(
                 Main.WINDOW_WIDTH / 2,
@@ -89,6 +97,7 @@ public class Game extends JPanel {
                 new EliteProEnemyFactory()
         };
         bossEnemyFactory = new BossEnemyFactory();
+        scoreRecordDao = new FileScoreRecordDao();
 
         // 启动英雄机鼠标监听
         new HeroController(this, heroAircraft);
@@ -323,12 +332,34 @@ public class Game extends JPanel {
      */
     private void checkResultAction() {
         // 游戏结束检查英雄机是否存活
-        if (heroAircraft.getHp() <= 0) {
+        if (heroAircraft.getHp() <= 0 && !gameOverFlag) {
             timer.cancel(); // 取消定时器并终止所有调度任务
             gameOverFlag = true;
             System.out.println("Game Over!");
+            saveAndPrintLeaderboard();
         }
     };
+
+    private void saveAndPrintLeaderboard() {
+        try {
+            scoreRecordDao.addRecord(new ScoreRecord(DEFAULT_PLAYER_NAME, score, LocalDateTime.now()));
+            List<ScoreRecord> records = scoreRecordDao.getAllRecords();
+
+            System.out.println("======== Leaderboard ========");
+            System.out.printf("%-6s %-14s %-8s %-19s%n", "Rank", "Name", "Score", "Time");
+            for (int i = 0; i < records.size(); i++) {
+                ScoreRecord record = records.get(i);
+                System.out.printf("%-6d %-14s %-8d %-19s%n",
+                        i + 1,
+                        record.getPlayerName(),
+                        record.getScore(),
+                        record.getRecordTimeText());
+            }
+            System.out.println("=============================");
+        } catch (RuntimeException ex) {
+            System.err.println("Failed to save leaderboard: " + ex.getMessage());
+        }
+    }
 
     // ***********************
     // Paint 各部分
