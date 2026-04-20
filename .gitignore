@@ -30,3 +30,7 @@ Temporary Items
 .vscode
 
 out
+
+.cph
+
+*.bin
