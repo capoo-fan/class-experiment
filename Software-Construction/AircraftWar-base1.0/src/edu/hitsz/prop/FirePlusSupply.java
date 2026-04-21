@@ -8,6 +8,8 @@ import edu.hitsz.aircraft.strategy.CircleShootStrategy;
  */
 public class FirePlusSupply extends AbstractProp {
 
+    private static final long EFFECT_DURATION_MS = 6_000L;
+
     public FirePlusSupply(int locationX, int locationY, int speedX, int speedY) {
         super(locationX, locationY, speedX, speedY);
     }
@@ -16,7 +18,7 @@ public class FirePlusSupply extends AbstractProp {
     public void effect() {
         HeroAircraft heroAircraft = HeroAircraft.getInstance();
         if (heroAircraft != null) {
-            heroAircraft.setShootStrategy(new CircleShootStrategy(20, 7));
+            heroAircraft.setShootStrategyForDuration(new CircleShootStrategy(20, 7), EFFECT_DURATION_MS);
         }
         System.out.println("FirePlusSupply active! Hero strategy -> CircleShootStrategy");
     }

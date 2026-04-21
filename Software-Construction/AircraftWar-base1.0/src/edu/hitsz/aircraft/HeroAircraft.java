@@ -21,11 +21,14 @@ public class HeroAircraft extends AbstractAircraft {
     // 子弹射击方向 (向上发射：-1，向下发射：1)
     private final int direction = -1;
 
+    private final ShootStrategy defaultShootStrategy;
     private ShootStrategy shootStrategy;
+    private long temporaryStrategyExpireAt = -1L;
 
     private HeroAircraft(int locationX, int locationY, int speedX, int speedY, int hp) {
         super(locationX, locationY, speedX, speedY, hp);
-        this.shootStrategy = new StraightShootStrategy(1);
+        this.defaultShootStrategy = new StraightShootStrategy(1);
+        this.shootStrategy = defaultShootStrategy;
     }
 
     public static synchronized HeroAircraft getInstance(int locationX, int locationY, int speedX, int speedY, int hp) {
@@ -39,11 +42,35 @@ public class HeroAircraft extends AbstractAircraft {
         return instance;
     }
 
-    public void setShootStrategy(ShootStrategy shootStrategy) {
+    public synchronized void setShootStrategy(ShootStrategy shootStrategy) {
         if (shootStrategy == null) {
             return;
         }
         this.shootStrategy = shootStrategy;
+        this.temporaryStrategyExpireAt = -1L;
+    }
+
+    public synchronized void setShootStrategyForDuration(ShootStrategy shootStrategy, long durationMillis) {
+        if (shootStrategy == null || durationMillis <= 0) {
+            return;
+        }
+        this.shootStrategy = shootStrategy;
+
+        long now = System.currentTimeMillis();
+        long base = Math.max(now, temporaryStrategyExpireAt);
+        temporaryStrategyExpireAt = base + durationMillis;
+    }
+
+    public synchronized void refreshShootStrategy() {
+        if (temporaryStrategyExpireAt < 0) {
+            return;
+        }
+        if (System.currentTimeMillis() < temporaryStrategyExpireAt) {
+            return;
+        }
+
+        shootStrategy = defaultShootStrategy;
+        temporaryStrategyExpireAt = -1L;
     }
 
     @Override
@@ -57,7 +84,8 @@ public class HeroAircraft extends AbstractAircraft {
      * 
      * @return 射击出的子弹List
      */
-    public List<BaseBullet> shoot() {
+    public synchronized List<BaseBullet> shoot() {
+        refreshShootStrategy();
         return shootStrategy.shoot(this.getLocationX(), this.getLocationY(), this.getSpeedY(), power, direction, true);
     }
 

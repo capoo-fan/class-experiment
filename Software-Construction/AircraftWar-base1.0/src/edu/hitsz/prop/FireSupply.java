@@ -8,6 +8,8 @@ import edu.hitsz.aircraft.strategy.ScatterShootStrategy;
  */
 public class FireSupply extends AbstractProp {
 
+    private static final long EFFECT_DURATION_MS = 8_000L;
+
     public FireSupply(int locationX, int locationY, int speedX, int speedY) {
         super(locationX, locationY, speedX, speedY);
     }
@@ -16,7 +18,7 @@ public class FireSupply extends AbstractProp {
     public void effect() {
         HeroAircraft heroAircraft = HeroAircraft.getInstance();
         if (heroAircraft != null) {
-            heroAircraft.setShootStrategy(new ScatterShootStrategy());
+            heroAircraft.setShootStrategyForDuration(new ScatterShootStrategy(), EFFECT_DURATION_MS);
         }
         System.out.println("FireSupply active! Hero strategy -> ScatterShootStrategy");
     }

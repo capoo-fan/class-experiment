@@ -47,6 +47,10 @@ public class ImageManager {
 
     private static final String[] IMAGE_NAMES = {
             "bg.jpg",
+            "bg2.jpg",
+            "bg3.jpg",
+            "bg4.jpg",
+            "bg5.jpg",
             "hero.png",
             "mob.png",
             "elite.png",
@@ -187,6 +191,14 @@ public class ImageManager {
             return null;
         }
         return get(obj.getClass().getName());
+    }
+
+    public static synchronized void switchBackground(String fileName) {
+        try {
+            BACKGROUND_IMAGE = loadImage(fileName);
+        } catch (IOException ex) {
+            throw new IllegalStateException("Cannot load background image: " + fileName, ex);
+        }
     }
 
 }

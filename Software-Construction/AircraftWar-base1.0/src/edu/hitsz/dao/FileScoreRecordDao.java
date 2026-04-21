@@ -54,6 +54,22 @@ public class FileScoreRecordDao implements ScoreRecordDao {
         records.add(record);
         records.sort(leaderboardOrder());
 
+        writeRecords(records);
+    }
+
+    @Override
+    public void deleteRecord(int index) {
+        List<ScoreRecord> records = getAllRecords();
+        if (index < 0 || index >= records.size()) {
+            return;
+        }
+        records.remove(index);
+
+        writeRecords(records);
+    }
+
+    private void writeRecords(List<ScoreRecord> records) {
+
         try {
             Files.createDirectories(storageFile.getParent());
             List<String> lines = new ArrayList<>(records.size());
