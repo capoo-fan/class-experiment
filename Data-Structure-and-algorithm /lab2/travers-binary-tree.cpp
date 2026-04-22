@@ -14,9 +14,10 @@ struct TreeNode *buildTree(int *preorder, int preordersize, int *inorder, int in
     {
         return NULL;
     }
-
+    // 前序遍历 中左右；中序遍历 左中右
+    // 前序遍历先找到根节点，在中序遍历找到左右子树
     struct TreeNode *root = (struct TreeNode *)malloc(sizeof(struct TreeNode));
-    root->val = preorder[0];
+    root->val = preorder[0]; 
     root->left = NULL;
     root->right = NULL;
 
@@ -39,6 +40,7 @@ struct TreeNode *buildTree(int *preorder, int preordersize, int *inorder, int in
     return root;
 }
 
+// BFS 
 void printTree(struct TreeNode *root)
 {
     if (root == NULL)
