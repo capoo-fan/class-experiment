@@ -36,3 +36,6 @@ out
 *.bin
 
 output
+
+*.docx
+*.doc
