@@ -16,7 +16,7 @@ void matmul_int8(int32_t* C, int8_t* A, int8_t* B, int dimD, int dimN)
     __asm__ volatile (
         "add   t0, zero, zero          \n\t" // t0 = i = 0 
         "add   t2, %[A], zero          \n\t" // t2 = Matrix_A 的当前元素指针
-        "add   t7, %[C], zero          \n\t" // t7 = Result_C 的当前元素指针 
+        "add   a5, %[C], zero          \n\t" // a5 = Result_C 的当前元素指针 
 
         "ROW_LOOP_%=:                  \n\t"
         "bge   t0, %[dimD], MATMUL_END_%=\n\t" // 如果 i >= dimD，结束循环
@@ -41,8 +41,8 @@ void matmul_int8(int32_t* C, int8_t* A, int8_t* B, int dimD, int dimN)
         "jal   zero, COL_LOOP_%=       \n\t" // 无条件跳转回 COL_LOOP (非伪指令)
 
         "COL_END_%=:                   \n\t"
-        "sw    t4, 0(t7)               \n\t" // 将结果存入 C[i]
-        "addi  t7, t7, 4               \n\t" // C的指针移动4字节(int32_t)
+        "sw    t4, 0(a5)               \n\t" // 将结果存入 C[i]
+        "addi  a5, a5, 4               \n\t" // C的指针移动4字节(int32_t)
         "addi  t0, t0, 1               \n\t" // i++
         
         "jal   zero, ROW_LOOP_%=       \n\t" // 无条件跳转回 ROW_LOOP (非伪指令)
@@ -51,7 +51,7 @@ void matmul_int8(int32_t* C, int8_t* A, int8_t* B, int dimD, int dimN)
 
         : // 没有内联汇编直接映射的输出变量，我们通过 memory 和指针直接写回
         : [C] "r" (C), [A] "r" (A), [B] "r" (B), [dimD] "r" (dimD), [dimN] "r" (dimN) // 传入映射
-        : "t0", "t1", "t2", "t3", "t4", "t5", "t6", "t7", "memory" // Clobber list声明使用的寄存器与内存修改
+        : "t0", "t1", "t2", "t3", "t4", "t5", "t6", "a5", "memory" // Clobber list声明使用的寄存器与内存修改
     );
 }
 

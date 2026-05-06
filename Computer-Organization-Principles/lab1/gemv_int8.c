@@ -1,5 +1,5 @@
 #include <stdio.h>  // 
-
+#include <stdint.h>
 #define DIM_D 4     // 矩阵行数     
 #define DIM_N 8     // 矩阵列数/向量长度
 
