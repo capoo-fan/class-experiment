@@ -69,9 +69,13 @@ PRINT_LOOP:
 # Sub-Routine: Matrix Multiplication
 #   a0: xxx parameter
 #   a1: ...
-#   a2: ...
+
 #   ...
 MATMUL_INT8:
+    # --- 1. 现场保护 ---
+    push ra             # 保存返回地址
+    push s0          
+
     add   t0, zero, zero    # t0 = i = 0 
     add   t2, a0, zero      # t2 = Matrix_A 的当前元素指针
     add   a5, a2, zero      # a5 = Result_C 的当前元素指针 
@@ -106,4 +110,8 @@ COL_END:
     jal   zero, ROW_LOOP    # 无条件跳转回 ROW_LOOP
 
 MATMUL_END:
-    jalr  zero, 0(ra)       # 返回
+    # --- 2. 现场恢复 ---
+    pop s0              # 恢复寄存器
+    pop ra              # 恢复返回地址
+    
+    jalr  zero, 0(ra)   # 子程序返回
