@@ -11,6 +11,7 @@ public class FreezeSupply extends AbstractProp {
 
     @Override
     public void effect() {
+        notifyFreezeObservers();
         System.out.println("FreezeSupply active!");
     }
 }

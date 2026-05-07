@@ -1,0 +1,29 @@
+@startuml
+
+title AircraftWar Template Method (Difficulty)
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+abstract class Game {
+  + action() : void
+  # initDifficultySettings() : void
+  # updateDifficultyProgress() : void
+  # isBossEnabled() : boolean
+  # getNextBossHp() : int
+}
+
+class EasyGame
+class NormalGame
+class HardGame
+
+Game <|-- EasyGame
+Game <|-- NormalGame
+Game <|-- HardGame
+
+note right of Game
+  action() defines the main loop
+  subclasses override difficulty hooks
+end note
+
+@enduml

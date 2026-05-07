@@ -10,7 +10,12 @@ package "application" {
     - score : int
     - scoreRecordDao : ScoreRecordDao
     + checkResultAction() : void
-    + saveAndPrintLeaderboard() : void
+    + showLeaderboardDialog() : void
+  }
+
+  class LeaderboardDialog {
+    - scoreRecordDao : ScoreRecordDao
+    + promptForPlayerNameAndSave() : void
   }
 }
 
@@ -26,6 +31,7 @@ package "dao" {
   interface ScoreRecordDao {
     + getAllRecords() : List<ScoreRecord>
     + addRecord(record : ScoreRecord) : void
+    + deleteRecord(index : int) : void
   }
 
   class FileScoreRecordDao {
@@ -38,6 +44,7 @@ package "dao" {
 
 ScoreRecordDao <|.. FileScoreRecordDao
 Game ..> ScoreRecordDao : use
+LeaderboardDialog ..> ScoreRecordDao : use
 FileScoreRecordDao ..> ScoreRecord : read/write
 
 note right of ScoreRecordDao

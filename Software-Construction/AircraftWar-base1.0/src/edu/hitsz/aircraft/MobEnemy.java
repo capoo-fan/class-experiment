@@ -22,4 +22,12 @@ public class MobEnemy extends AbstractEnemy {
         return new LinkedList<>();
     }
 
+    @Override
+    public void onFreezeEffect() {
+        if (notValid()) {
+            return;
+        }
+        freezeForever();
+    }
+
 }

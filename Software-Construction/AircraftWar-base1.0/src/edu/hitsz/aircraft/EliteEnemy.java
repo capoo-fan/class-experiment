@@ -24,4 +24,12 @@ public class EliteEnemy extends AbstractEnemy {
     public List<BaseBullet> shoot() {
         return shootStrategy.shoot(this.getLocationX(), this.getLocationY(), this.getSpeedY(), power, direction, false);
     }
+
+    @Override
+    public void onFreezeEffect() {
+        if (notValid()) {
+            return;
+        }
+        freezeForMillis(4_000L);
+    }
 }

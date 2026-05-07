@@ -1,0 +1,31 @@
+@startuml
+
+class BankDemo {
+}
+
+abstract class BankBusiness {
+    + process() : void
+    + prepare() : void
+    + isVip() : boolean
+    + {abstract} doBusiness() : void
+    - takeNumber() : void
+    - evaluate() : void
+}
+
+class DepositBusiness {
+    + doBusiness() : void
+}
+
+class WealthManagement {
+    + prepare() : void
+    + isVip() : boolean
+    + doBusiness() : void
+}
+
+BankDemo ..> BankBusiness
+BankBusiness -[hidden]down-> DepositBusiness
+
+DepositBusiness -up-|> BankBusiness
+WealthManagement -up-|> BankBusiness
+
+@enduml

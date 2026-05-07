@@ -1,6 +1,6 @@
 @startuml
 
-title AircraftWar 策略模式（弹道与火力道具）
+title AircraftWar Strategy (Shooting)
 
 skinparam classAttributeIconSize 0
 skinparam packageStyle rectangle
@@ -17,6 +17,7 @@ class CircleShootStrategy
 class HeroAircraft {
   - shootStrategy : ShootStrategy
   + setShootStrategy(strategy : ShootStrategy) : void
+  + setShootStrategyForDuration(strategy : ShootStrategy, durationMillis : long) : void
   + shoot() : List<BaseBullet>
 }
 

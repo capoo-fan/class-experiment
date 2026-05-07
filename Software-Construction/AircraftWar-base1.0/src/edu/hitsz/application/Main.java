@@ -30,7 +30,19 @@ public class Main {
                 WINDOW_WIDTH, WINDOW_HEIGHT);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        Game game = new Game(difficulty);
+        Game game;
+        switch (difficulty) {
+            case EASY:
+                game = new EasyGame();
+                break;
+            case HARD:
+                game = new HardGame();
+                break;
+            case NORMAL:
+            default:
+                game = new NormalGame();
+                break;
+        }
         frame.add(game);
         frame.setVisible(true);
         game.action();

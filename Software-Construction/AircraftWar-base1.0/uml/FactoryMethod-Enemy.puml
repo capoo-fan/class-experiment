@@ -1,12 +1,12 @@
 @startuml
 
-title AircraftWar 工厂方法模式（敌机创建）
+title AircraftWar Factory Method (Enemy Creation)
 
 skinparam classAttributeIconSize 0
 skinparam packageStyle rectangle
 
 class Game {
-  - createRandomEnemy() : AbstractAircraft
+  - createRandomEnemy() : AbstractEnemy
 }
 
 interface EnemyFactory {
@@ -23,29 +23,34 @@ class MobEnemyFactory
 class EliteEnemyFactory
 class ElitePlusEnemyFactory
 class EliteProEnemyFactory
+class BossEnemyFactory
 
 abstract class AbstractEnemy
 class MobEnemy
 class EliteEnemy
 class ElitePlusEnemy
 class EliteProEnemy
+class BossEnemy
 
 EnemyFactory <|.. AbstractEnemyFactory
 AbstractEnemyFactory <|-- MobEnemyFactory
 AbstractEnemyFactory <|-- EliteEnemyFactory
 AbstractEnemyFactory <|-- ElitePlusEnemyFactory
 AbstractEnemyFactory <|-- EliteProEnemyFactory
+AbstractEnemyFactory <|-- BossEnemyFactory
 
 AbstractEnemy <|-- MobEnemy
 AbstractEnemy <|-- EliteEnemy
 AbstractEnemy <|-- ElitePlusEnemy
 AbstractEnemy <|-- EliteProEnemy
+AbstractEnemy <|-- BossEnemy
 
 Game ..> EnemyFactory : 依赖
 MobEnemyFactory ..> MobEnemy : 创建
 EliteEnemyFactory ..> EliteEnemy : 创建
 ElitePlusEnemyFactory ..> ElitePlusEnemy : 创建
 EliteProEnemyFactory ..> EliteProEnemy : 创建
+BossEnemyFactory ..> BossEnemy : 创建
 
 note right of Game
   按权重随机选择工厂，

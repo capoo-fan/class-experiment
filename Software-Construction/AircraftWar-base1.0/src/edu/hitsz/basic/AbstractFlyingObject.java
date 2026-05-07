@@ -20,6 +20,12 @@ public abstract class AbstractFlyingObject {
     protected int speedX;
     protected int speedY;
 
+    // 速度效果（冻结/减速）
+    private boolean speedEffectActive = false;
+    private int speedEffectOriginX = 0;
+    private int speedEffectOriginY = 0;
+    private long speedEffectExpireAt = -1L;
+
     //图片, null 表示未设置
     protected BufferedImage image = null;
 
@@ -47,6 +53,7 @@ public abstract class AbstractFlyingObject {
      * 若飞行对象触碰到横向边界，横向速度反向
      */
     public void forward() {
+        refreshSpeedEffect();
         locationX += speedX;
         locationY += speedY;
         if (locationX <= 0 || locationX >= Main.WINDOW_WIDTH) {
@@ -139,6 +146,69 @@ public abstract class AbstractFlyingObject {
 
     public boolean notValid() {
         return !this.isValid;
+    }
+
+    protected void applyFreeze(long durationMs) {
+        applySpeedEffect(0.0, durationMs);
+    }
+
+    protected void applySlowdown(double factor, long durationMs) {
+        double safeFactor = Math.max(0.0, Math.min(1.0, factor));
+        applySpeedEffect(safeFactor, durationMs);
+    }
+
+    protected void applySpeedEffect(double factor, long durationMs) {
+        if (!speedEffectActive) {
+            speedEffectOriginX = speedX;
+            speedEffectOriginY = speedY;
+        }
+        speedEffectActive = true;
+
+        long now = System.currentTimeMillis();
+        if (durationMs <= 0) {
+            speedEffectExpireAt = Long.MAX_VALUE;
+        } else {
+            long newExpireAt = now + durationMs;
+            if (newExpireAt > speedEffectExpireAt) {
+                speedEffectExpireAt = newExpireAt;
+            }
+        }
+
+        speedX = scaledSpeed(speedEffectOriginX, factor);
+        speedY = scaledSpeed(speedEffectOriginY, factor);
+    }
+
+    protected void refreshSpeedEffect() {
+        if (!speedEffectActive) {
+            return;
+        }
+        if (speedEffectExpireAt == Long.MAX_VALUE) {
+            return;
+        }
+        if (System.currentTimeMillis() < speedEffectExpireAt) {
+            return;
+        }
+
+        speedEffectActive = false;
+        speedX = speedEffectOriginX;
+        speedY = speedEffectOriginY;
+        speedEffectExpireAt = -1L;
+    }
+
+    public void scaleSpeed(double factor) {
+        speedX = scaledSpeed(speedX, factor);
+        speedY = scaledSpeed(speedY, factor);
+    }
+
+    private int scaledSpeed(int baseSpeed, double factor) {
+        if (factor == 0.0) {
+            return 0;
+        }
+        int scaled = (int) Math.round(baseSpeed * factor);
+        if (scaled == 0 && baseSpeed != 0) {
+            return baseSpeed > 0 ? 1 : -1;
+        }
+        return scaled;
     }
 
 }

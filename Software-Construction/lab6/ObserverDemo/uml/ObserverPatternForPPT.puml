@@ -1,0 +1,58 @@
+@startuml
+
+
+interface DeviceObserver {
+    +{abstract}onFireAlarm() : void
+    +{abstract}onSecurityAlarm() : void
+}
+
+class SmartLight {
+    +onFireAlarm() : void
+    +onSecurityAlarm() : void
+}
+
+class SmartDoorLock {
+    +onFireAlarm() : void
+    +onSecurityAlarm() : void
+}
+
+class SmartSprinkler {
+    +onFireAlarm() : void
+    +onSecurityAlarm() : void
+}
+
+
+abstract class AlarmSubject {
+    -devices : List<DeviceObserver>
+    +addDevice(device : DeviceObserver) : void
+    +removeDevice(device : DeviceObserver) : void
+    +{abstract}notifyDevices(): void
+    +{abstract}trigger() : void
+}
+
+class FireAlarm {
+    +notifyDevices(): void
+    +trigger() : void
+}
+
+class SecurityAlarm {
+    +notifyDevices(): void
+    +trigger() : void
+}
+
+class SmartHomeDemo {
+}
+
+SmartLight .up.|>  DeviceObserver
+SmartDoorLock .up.|> DeviceObserver
+SmartSprinkler .up.|>  DeviceObserver
+
+FireAlarm -up-|> AlarmSubject
+SecurityAlarm -up-|> AlarmSubject
+
+
+AlarmSubject o-right-> DeviceObserver
+SmartHomeDemo ..> AlarmSubject
+SmartHomeDemo ..> DeviceObserver
+
+@enduml

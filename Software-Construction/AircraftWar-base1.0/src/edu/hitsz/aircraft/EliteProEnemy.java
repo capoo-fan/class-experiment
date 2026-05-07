@@ -11,6 +11,8 @@ import java.util.List;
  */
 public class EliteProEnemy extends AbstractEnemy {
 
+    private static final int BOMB_DAMAGE = 30;
+
     private final int power = 18;
     private final int direction = 1;
     private final ShootStrategy shootStrategy;
@@ -23,5 +25,22 @@ public class EliteProEnemy extends AbstractEnemy {
     @Override
     public List<BaseBullet> shoot() {
         return shootStrategy.shoot(this.getLocationX(), this.getLocationY(), this.getSpeedY(), power, direction, false);
+    }
+
+    @Override
+    public int onBombEffect() {
+        if (notValid()) {
+            return 0;
+        }
+        decreaseHp(BOMB_DAMAGE);
+        return 0;
+    }
+
+    @Override
+    public void onFreezeEffect() {
+        if (notValid()) {
+            return;
+        }
+        slowForMillis(0.5, 5_000L);
     }
 }

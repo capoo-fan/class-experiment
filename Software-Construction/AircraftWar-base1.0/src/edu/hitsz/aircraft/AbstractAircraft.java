@@ -40,6 +40,15 @@ public abstract class AbstractAircraft extends AbstractFlyingObject {
         }
     }
 
+    public void scaleHp(double factor) {
+        if (factor <= 0) {
+            return;
+        }
+        int newMaxHp = Math.max(1, (int) Math.round(maxHp * factor));
+        maxHp = newMaxHp;
+        hp = Math.min(newMaxHp, Math.max(1, (int) Math.round(hp * factor)));
+    }
+
     /**
      * 飞机射击方法
      * 

@@ -28,9 +28,20 @@ public class BossEnemy extends AbstractEnemy {
 
     @Override
     public void forward() {
+        refreshSpeedEffect();
         locationX += speedX;
         if (locationX <= 0 || locationX >= Main.WINDOW_WIDTH) {
             speedX = -speedX;
         }
+    }
+
+    @Override
+    public int onBombEffect() {
+        return 0;
+    }
+
+    @Override
+    public void onFreezeEffect() {
+        // Boss 不受冰冻影响
     }
 }

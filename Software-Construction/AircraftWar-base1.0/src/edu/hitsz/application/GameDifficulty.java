@@ -1,7 +1,7 @@
 package edu.hitsz.application;
 
 /**
- * 游戏难度配置，仅用于切换对应地图。
+ * 游戏难度配置。
  */
 public enum GameDifficulty {
     EASY("简单", "bg3.jpg"),
