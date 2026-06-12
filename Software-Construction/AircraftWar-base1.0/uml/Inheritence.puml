@@ -1,0 +1,187 @@
+@startuml
+title AircraftWar 系统继承关系类图（任务4.3）
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+
+package "basic" {
+abstract class AbstractFlyingObject {
+    # locationX : int
+    # locationY : int
+    # speedX : int
+    # speedY : int
+    # image : BufferedImage
+    # width : int
+    # height : int
+    # isValid : boolean
+
+    + AbstractFlyingObject(int locationX, int locationY, int speedX, int speedY)
+    + forward() : void
+    + crash(AbstractFlyingObject flyingObject) : boolean
+    + setLocation(double locationX, double locationY) : void
+    + getLocationX() : int
+    + getLocationY() : int
+    + getSpeedY() : int
+    + getImage() : BufferedImage
+    + getWidth() : int
+    + getHeight() : int
+    + notValid() : boolean
+    + vanish() : void
+}
+}
+
+package "aircraft" {
+abstract class AbstractAircraft {
+    # maxHp : int
+    # hp : int
+
+    + AbstractAircraft(int locationX, int locationY, int speedX, int speedY, int hp)
+    + decreaseHp(int decrease) : void
+    + getHp() : int
+    + {abstract} shoot() : List<BaseBullet>
+}
+
+abstract class AbstractEnemy {
+    + AbstractEnemy(int locationX, int locationY, int speedX, int speedY, int hp)
+    + forward() : void
+}
+
+class HeroAircraft {
+    - {static} instance : HeroAircraft
+    - shootNum : int
+    - power : int
+    - direction : int
+
+    - HeroAircraft(int locationX, int locationY, int speedX, int speedY, int hp)
+    + {static} getInstance(int locationX, int locationY, int speedX, int speedY, int hp) : HeroAircraft
+    + forward() : void
+    + shoot() : List<BaseBullet>
+}
+
+class MobEnemy {
+    + MobEnemy(int locationX, int locationY, int speedX, int speedY, int hp)
+    + shoot() : List<BaseBullet>
+}
+
+class EliteEnemy {
+    - shootNum : int
+    - power : int
+    - direction : int
+    + EliteEnemy(int locationX, int locationY, int speedX, int speedY, int hp)
+    + shoot() : List<BaseBullet>
+}
+
+class ElitePlusEnemy {
+    + ElitePlusEnemy(int locationX, int locationY, int speedX, int speedY, int hp)
+    + shoot() : List<BaseBullet>
+}
+
+class EliteProEnemy {
+    + EliteProEnemy(int locationX, int locationY, int speedX, int speedY, int hp)
+    + shoot() : List<BaseBullet>
+}
+
+class BossEnemy {
+    + BossEnemy(int locationX, int locationY, int speedX, int speedY, int hp)
+    + shoot() : List<BaseBullet>
+}
+}
+
+package "bullet" {
+abstract class BaseBullet {
+    - power : int
+
+    + BaseBullet(int locationX, int locationY, int speedX, int speedY, int power)
+    + forward() : void
+    + getPower() : int
+}
+
+class HeroBullet {
+    + HeroBullet(int locationX, int locationY, int speedX, int speedY, int power)
+}
+
+class EnemyBullet {
+    + EnemyBullet(int locationX, int locationY, int speedX, int speedY, int power)
+}
+}
+
+package "prop" {
+abstract class AbstractProp {
+    + AbstractProp(int locationX, int locationY, int speedX, int speedY)
+    + forward() : void
+    + {abstract} effect() : void
+}
+
+class BloodSupply {
+    + BloodSupply(int locationX, int locationY, int speedX, int speedY)
+    + effect() : void
+}
+
+class BombSupply {
+    + BombSupply(int locationX, int locationY, int speedX, int speedY)
+    + effect() : void
+}
+
+class FireSupply {
+    + FireSupply(int locationX, int locationY, int speedX, int speedY)
+    + effect() : void
+}
+
+class FirePlusSupply {
+    + FirePlusSupply(int locationX, int locationY, int speedX, int speedY)
+    + effect() : void
+}
+
+class FreezeSupply {
+    + FreezeSupply(int locationX, int locationY, int speedX, int speedY)
+    + effect() : void
+}
+}
+
+package "application" {
+class Game
+class HeroController
+class Main
+}
+
+AbstractFlyingObject <|-- AbstractAircraft
+AbstractAircraft <|-- AbstractEnemy
+AbstractFlyingObject <|-- BaseBullet
+AbstractFlyingObject <|-- AbstractProp
+
+AbstractAircraft <|-- HeroAircraft
+AbstractEnemy <|-- MobEnemy
+AbstractEnemy <|-- EliteEnemy
+AbstractEnemy <|-- ElitePlusEnemy
+AbstractEnemy <|-- EliteProEnemy
+AbstractEnemy <|-- BossEnemy
+
+BaseBullet <|-- HeroBullet
+BaseBullet <|-- EnemyBullet
+
+AbstractProp <|-- BloodSupply
+AbstractProp <|-- BombSupply
+AbstractProp <|-- FireSupply
+AbstractProp <|-- FirePlusSupply
+AbstractProp <|-- FreezeSupply
+
+Game --> HeroAircraft : 持有 heroAircraft
+Game ..> HeroAircraft : getInstance(...)
+Game --> "0..*" AbstractAircraft : 持有 enemyAircrafts
+Game --> "0..*" BaseBullet : 持有 bullets
+HeroController --> HeroAircraft : 控制移动
+HeroController --> Game : 注册监听
+
+note right of HeroAircraft
+    单例关键点：
+    1) 私有静态实例 instance
+    2) 私有构造方法
+    3) 静态方法 getInstance() 统一创建
+end note
+
+note right of Game
+    敌机生成策略：
+    周期触发，随机生成 MobEnemy 或 EliteEnemy。
+end note
+
+@enduml
