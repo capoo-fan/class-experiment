@@ -1,0 +1,15 @@
+[project]
+name = "dual-energy-denoise-lab4"
+version = "0.1.0"
+description = "Deep-learning lab 4: dual-energy image correction with a residual CNN."
+requires-python = ">=3.9,<3.13"
+dependencies = [
+    "matplotlib>=3.7",
+    "numpy>=1.24",
+    "pillow>=10.0",
+    "torch>=2.2",
+    "tqdm>=4.66",
+]
+
+[tool.uv]
+package = false

@@ -40,4 +40,11 @@ output
 *.docx
 *.doc
 
-data-cat-dog.zip
+*.zip
+
+.venv/
+.venv312/
+.uv-cache/
+.matplotlib-cache/
+__pycache__/
+*.pyc
